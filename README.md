@@ -1,10 +1,10 @@
 # 大屏投屏
 
-轻量 Android DLNA 视频接收器。打开电视，等待投屏，把时间留给观看。
+开源、轻量的 Android DLNA 视频接收器。打开电视，等待投屏，把时间留给观看。
 
 **当前为小范围公开测试版，不是保证所有电视、手机 App 都兼容的正式产品。**
 
-[官网](https://tvbox-cast.kongdefei8813.chatgpt.site/) · [下载 APK](https://github.com/KDF5000/tvbox-cast/releases/tag/v2.0.1-beta.1) · [安装与使用](docs/INSTALL.md) · [常见问题](docs/FAQ.md) · [反馈问题](https://github.com/KDF5000/tvbox-cast/issues/new/choose)
+[官网](https://tvbox-cast.kongdefei8813.chatgpt.site/) · [下载 APK](https://github.com/KDF5000/tvbox-cast/releases/tag/v2.0.1-beta.1) · [应用源码](cast-launcher/src/local/tvbox/castlauncher) · [构建说明](docs/BUILD.md) · [安装与使用](docs/INSTALL.md) · [反馈问题](https://github.com/KDF5000/tvbox-cast/issues/new/choose)
 
 ## 能做什么
 
@@ -46,13 +46,33 @@
 见 [隐私说明](docs/PRIVACY.md)。应用没有账号、统计 SDK 或自建云端中转。
 在线视频和字幕会由设备访问各自源站；系统和视频源自己的行为不受本应用控制。
 
-## 仓库范围与授权
+## 源码与开发
 
-本仓库只发布 APK、文档和官网公开资料，应用源码暂未开源。
-没有附带开源许可证；公开下载不代表授予修改、再分发或商用授权。
-软件以测试用途提供，不附全面兼容性或持续服务保证；第三方组件和权利仍归其权利人。
+Android 应用源码位于 [`cast-launcher`](cast-launcher)，包含独立 DLNA 接收器、播放器、界面、资源和协议测试。
+代码基于当前 `2.0.1-beta.1` 公开版本，不包含已经从公开 APK 移除的旧华为兼容入口。
+预览和测试中的设备地址已换成文档示例地址。
+
+安装 JDK 17 后可运行纯 Java 测试，无需 Android SDK、电视或 ADB：
+
+```sh
+sh cast-launcher/test.sh
+```
+
+构建 APK 需要 Node.js 18+、JDK 17、Android SDK 和 `zip`。设置 `ANDROID_SDK_ROOT` 后运行：
+
+```sh
+node cast-launcher/build.mjs
+```
+
+详见 [构建和架构说明](docs/BUILD.md) 与 [贡献指南](CONTRIBUTING.md)。
+本地构建使用本机生成的调试签名，不能直接覆盖官方签名 APK；构建、测试和预览均不会操作电视。
+
+## 授权与素材
+
+应用源码及本项目自有代码、文档采用 [MIT 许可证](LICENSE)，允许修改、再分发和商用，须保留版权及许可声明。
+软件按原样提供，不附全面兼容性或持续服务保证。第三方字体、图标等保留各自许可证，见 [第三方与素材说明](THIRD_PARTY_NOTICES.md)。
 
 官网背景为 AI 生成的山湖视觉，未使用第三方摄影作品；这并不构成零版权风险保证。
 应用图标为原创代码绘制的投屏符号，不使用平台或厂商商标。
 
-本仓库不包含签名私钥、设备备份、系统 APK、维护脚本、真实设备截图或测试媒体。
+本仓库不包含发布签名私钥、设备备份、系统 APK、设备精简脚本、真实设备截图或测试媒体。

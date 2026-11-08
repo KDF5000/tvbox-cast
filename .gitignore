@@ -2,3 +2,14 @@
 *.apk
 *.jks
 *.keystore
+**/build/
+**/test-output/
+**/preview-output/
+.env
+.env.*
+local.properties
+device-backup/
+.private-signing/
+.openai/
+*.pem
+*.key
