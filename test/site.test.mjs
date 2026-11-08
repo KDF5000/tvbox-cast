@@ -69,6 +69,38 @@ test('font files and their licenses are bundled locally', () => {
   assert.doesNotMatch(html, /<script[^>]+src="https?:/);
 });
 
+test('light theme surfaces, navigation and icons stay consistent', () => {
+  assert.match(css, /color-scheme:light/);
+  assert.match(css, /--base:#faf9f6/);
+  assert.match(css, /--nav-surface:rgb\(250 249 246/);
+  assert.match(css, /background:var\(--menu-surface\)/);
+  assert.match(css, /\.primary\{[^}]*color:var\(--on-accent\)/);
+  assert.match(css, /\.primary \.icon\{filter:invert\(1\)/);
+  assert.match(css, /linear-gradient\(90deg,#000,#666666\)/);
+  for (const file of ['index.html', 'terms.html', '404.html']) {
+    assert.match(readFileSync(resolve(root, file), 'utf8'), /name="theme-color" content="#faf9f6"/);
+  }
+});
+
+test('normal-size text and primary buttons meet WCAG AA contrast on light surfaces', () => {
+  const tokens = Object.fromEntries([...css.matchAll(/--([a-z-]+):#([a-f\d]{6})(?=;)/g)].map(([, name, color]) => [name, color]));
+  function luminance(hex) {
+    const rgb = hex.match(/../g).map(value => parseInt(value, 16) / 255).map(value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4);
+    return rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722;
+  }
+  function contrast(a, b) {
+    const values = [luminance(a), luminance(b)].sort((a, b) => b - a);
+    return (values[0] + .05) / (values[1] + .05);
+  }
+  for (const foreground of ['text', 'muted', 'quiet', 'accent']) {
+    for (const background of ['base', 'surface', 'raised']) {
+      assert.ok(contrast(tokens[foreground], tokens[background]) >= 4.5, `${foreground} on ${background}`);
+    }
+  }
+  assert.ok(contrast('ffffff', tokens.accent) >= 4.5, 'primary button');
+  assert.match(readFileSync(resolve(root, 'assets/cast-light.svg'), 'utf8'), new RegExp(`#${tokens.accent}`));
+});
+
 test('final download contains a separate two-line tagline without another repeated section', () => {
   assert.equal([...html.matchAll(/class="tagline-line"/g)].length, 2);
   assert.equal([...html.matchAll(/class="tagline-word"/g)].length, 4);
