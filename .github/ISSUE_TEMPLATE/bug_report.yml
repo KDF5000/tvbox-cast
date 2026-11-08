@@ -1,0 +1,46 @@
+name: 测试反馈 / 兼容性问题
+description: 报告设备发现、连接或播放问题（请勿提交敏感信息）。
+title: "[反馈] "
+body:
+  - type: markdown
+    attributes:
+      value: 请勿提交密码、Wi-Fi 密码、带鉴权参数的视频链接或完整设备备份。截图和日志请先脱敏。
+  - type: input
+    id: receiver
+    attributes:
+      label: 电视 / 盒子型号及 Android 版本
+      placeholder: 型号、固件或 Android 版本
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 大屏投屏版本
+    validations:
+      required: true
+  - type: input
+    id: sender
+    attributes:
+      label: 手机系统、发送端 App 和版本
+    validations:
+      required: true
+  - type: dropdown
+    id: symptom
+    attributes:
+      label: 问题类型
+      options:
+        - 搜索不到设备
+        - 搜索到但连接失败
+        - 连接成功但视频无法播放
+        - 字幕 / 遥控器 / 进度问题
+        - 默认桌面 / 启动问题
+        - 其他
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤、首页状态与实际表现
+      description: 可以附脱敏截图，不要附带私人视频鉴权 URL。
+    validations:
+      required: true
