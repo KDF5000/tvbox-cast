@@ -12,6 +12,7 @@ function fixture({ reduced = false, observersAvailable = true } = {}) {
   const words = Array.from({ length: 4 }, element);
   const sections = Array.from({ length: 3 }, element);
   const root = element();
+  root.scrollHeight = 2000;
   const observers = [];
   const frames = [];
   const listeners = new Map();
@@ -20,6 +21,7 @@ function fixture({ reduced = false, observersAvailable = true } = {}) {
   const media = { matches: reduced, addEventListener: () => {} };
   const window = {
     innerHeight: 1000,
+    scrollY: 0,
     matchMedia: query => query.includes('reduced') ? media : { matches: false },
     addEventListener: (type, fn) => listeners.set(type, fn),
     removeEventListener: type => listeners.delete(type),
@@ -37,7 +39,7 @@ function fixture({ reduced = false, observersAvailable = true } = {}) {
     querySelectorAll: selector => selector === '.reveal' ? sections : selector === '.tagline-word' ? words : [],
   };
   vm.runInNewContext(script, { document, window, IntersectionObserver: Observer, requestAnimationFrame: fn => frames.push(fn) });
-  return { words, sections, root, observers, frames, listeners, setTop: value => { top = value; }, flush: () => { while (frames.length) frames.shift()(); } };
+  return { words, sections, root, observers, frames, listeners, setTop: value => { top = value; }, setScroll: value => { window.scrollY = value; }, flush: () => { while (frames.length) frames.shift()(); } };
 }
 
 test('reduced motion shows every tagline word in its final state immediately', () => {
@@ -78,4 +80,15 @@ test('section reveals are observed once, not replayed on every scroll', () => {
   f.observers[0].callback([{ isIntersecting: true, target: f.sections[0] }]);
   assert.ok(f.sections[0].classList.contains('is-visible'));
   assert.deepEqual(f.observers[0].removed, [f.sections[0]]);
+});
+
+test('a short page completes its visible tagline when the reader reaches the bottom', () => {
+  const f = fixture();
+  f.root.scrollHeight = 1400;
+  f.setScroll(400);
+  f.setTop(700);
+  f.observers[2].callback([{ isIntersecting: true }]);
+  f.flush();
+  assert.ok(f.words.every(word => word.classList.contains('is-active')));
+  assert.ok(!f.listeners.has('scroll'));
 });

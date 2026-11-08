@@ -1,27 +1,4 @@
 'use strict';
-const copy = document.getElementById('copy-checksum');
-const status = document.getElementById('copy-status');
-copy?.addEventListener('click', async () => {
-  const value = document.getElementById('checksum-value').textContent.trim();
-  copy.disabled = true;
-  copy.setAttribute('aria-busy', 'true');
-  status.textContent = '正在复制校验值';
-  try {
-    await navigator.clipboard.writeText(value);
-    status.textContent = '校验值已复制';
-  } catch {
-    const range = document.createRange();
-    range.selectNodeContents(document.getElementById('checksum-value'));
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-    status.textContent = '自动复制失败，请手动复制上方已选中的校验值';
-  } finally {
-    copy.disabled = false;
-    copy.removeAttribute('aria-busy');
-  }
-});
-
 const toggle = document.querySelector('.menu-toggle');
 const navigation = document.getElementById('main-navigation');
 const main = document.querySelector('main');
@@ -104,7 +81,10 @@ if ('IntersectionObserver' in window) {
     if (!tagline || complete) return;
     const top = tagline.getBoundingClientRect().top;
     const progress = (window.innerHeight * .8 - top) / (window.innerHeight * .3);
-    const count = reducedMotion.matches ? words.length : Math.max(0, Math.min(words.length, Math.ceil(progress * words.length)));
+    // A short page may end before the tagline reaches the normal trigger line.
+    const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    const count = reducedMotion.matches || (atBottom && watching && top < window.innerHeight)
+      ? words.length : Math.max(0, Math.min(words.length, Math.ceil(progress * words.length)));
     words.forEach((word, index) => {
       if (index < count) word.classList.add('is-active');
     });

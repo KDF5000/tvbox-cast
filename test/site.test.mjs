@@ -9,7 +9,6 @@ const html = readFileSync(resolve(root, 'index.html'), 'utf8');
 const css = readFileSync(resolve(root, 'style.css'), 'utf8');
 const js = readFileSync(resolve(root, 'script.js'), 'utf8');
 const apk = 'https://github.com/KDF5000/tvbox-cast/releases/download/v2.0.1-beta.1/tvbox-cast-2.0.1-beta.1.apk';
-const checksum = '569af6860bde9be0895954259af6c998903aa0639ebf2246bd9d75f382d45aa2';
 
 for (const file of ['index.html', 'terms.html', '404.html']) {
   const content = readFileSync(resolve(root, file), 'utf8');
@@ -31,18 +30,26 @@ for (const file of ['index.html', 'terms.html', '404.html']) {
   });
 }
 
-test('one consistent APK action appears at hero, download and final CTA', () => {
+test('one consistent APK action appears only at hero and final download', () => {
   const buttons = [...html.matchAll(/<a class="button primary button-md"[^>]*href="([^"]+)"[^>]*>([^<]+)/g)];
-  assert.equal(buttons.length, 3);
+  assert.equal(buttons.length, 2);
   buttons.forEach(([, url, label]) => {
     assert.equal(url, apk);
     assert.equal(label.trim(), '下载 Android 版');
   });
-  assert.ok(html.includes(checksum));
 });
 
-test('compatibility, network risk, signature and private-source boundaries remain explicit', () => {
-  for (const fact of ['152 项', 'EC6108V9_8G', '全面兼容', '标准 DLNA', '没有 PIN', 'MIT 许可证', '不能直接覆盖', 'AirPlay', 'Google Cast', 'DRM', '可信家庭网络']) assert.ok(html.includes(fact), fact);
+test('brief compatibility and beta notices remain, with detailed docs one click away', () => {
+  for (const fact of ['Android 4.4', '标准 DLNA', '可信家庭网络', '测试版', 'MIT 开源']) assert.ok(html.includes(fact), fact);
+  for (const doc of ['docs/INSTALL.md', 'docs/FAQ.md', 'docs/PRIVACY.md', 'releases/tag/v2.0.1-beta.1']) assert.ok(html.includes(doc), doc);
+});
+
+test('homepage stays a short download page rather than a manual', () => {
+  const body = html.split('<body>')[1].replace(/<[^>]+>/g, '');
+  assert.ok((body.match(/[\u4e00-\u9fff]/g) || []).length <= 300, 'keep homepage copy concise');
+  assert.equal([...html.matchAll(/<section\b/g)].length, 4);
+  assert.equal([...html.matchAll(/<li class="reveal"/g)].length, 3);
+  assert.doesNotMatch(html, /class="(?:release-card|question|signal-panel)|id="checksum-value"/);
 });
 
 test('approved typography and a single heading-only gradient', () => {
@@ -62,8 +69,7 @@ test('font files and their licenses are bundled locally', () => {
   assert.doesNotMatch(html, /<script[^>]+src="https?:/);
 });
 
-test('six directly readable questions and a separate two-line tagline', () => {
-  assert.equal([...html.matchAll(/class="question reveal"/g)].length, 6);
+test('final download contains a separate two-line tagline without another repeated section', () => {
   assert.equal([...html.matchAll(/class="tagline-line"/g)].length, 2);
   assert.equal([...html.matchAll(/class="tagline-word"/g)].length, 4);
   assert.doesNotMatch(html, /<details/);
@@ -78,14 +84,13 @@ test('motion uses observers and frame-throttled word updates, with reduced-motio
   assert.doesNotMatch(css, /\b(ease-in-out|linear|ease)\s*[,;}]/);
 });
 
-test('menu and copy ship keyboard, focus, loading and error handling', () => {
+test('menu retains keyboard navigation, focus and background isolation', () => {
   assert.match(js, /event.key === 'Escape'/);
   assert.match(js, /event.key === 'Tab'/);
   assert.match(js, /navigation.inert/);
   assert.match(css, /:focus-visible/);
-  assert.match(js, /aria-busy/);
-  assert.match(js, /自动复制失败/);
-  assert.match(html, /aria-live="polite"/);
+  assert.match(js, /main.inert = expanded/);
+  assert.doesNotMatch(js, /copy-checksum|clipboard/);
   assert.doesNotMatch(js, /alert\(/);
 });
 
