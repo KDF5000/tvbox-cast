@@ -11,5 +11,6 @@ local.properties
 device-backup/
 .private-signing/
 .openai/
+.vercel/
 *.pem
 *.key
