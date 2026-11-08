@@ -72,6 +72,7 @@ test('font files and their licenses are bundled locally', () => {
 test('light theme surfaces, navigation and icons stay consistent', () => {
   assert.match(css, /color-scheme:light/);
   assert.match(css, /--base:#faf9f6/);
+  assert.match(css, /--accent:#a64b2b/);
   assert.match(css, /--nav-surface:rgb\(250 249 246/);
   assert.match(css, /background:var\(--menu-surface\)/);
   assert.match(css, /\.primary\{[^}]*color:var\(--on-accent\)/);
@@ -98,7 +99,7 @@ test('normal-size text and primary buttons meet WCAG AA contrast on light surfac
     }
   }
   assert.ok(contrast('ffffff', tokens.accent) >= 4.5, 'primary button');
-  assert.match(readFileSync(resolve(root, 'assets/cast-light.svg'), 'utf8'), new RegExp(`#${tokens.accent}`));
+  assert.match(readFileSync(resolve(root, 'assets/cast-warm.svg'), 'utf8'), new RegExp(`#${tokens.accent}`));
 });
 
 test('final download contains a separate two-line tagline without another repeated section', () => {

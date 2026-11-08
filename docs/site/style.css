@@ -3,7 +3,7 @@
 @font-face{font-family:"Geist Mono";src:url("assets/geist-mono.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 :root{
   --base:#faf9f6;--surface:#f0f1eb;--raised:#e3e7dd;--line:#d8ded3;
-  --text:#252c27;--muted:#535d56;--quiet:#5f6861;--accent:#236b54;
+  --text:#252c27;--muted:#535d56;--quiet:#5f6861;--accent:#a64b2b;
   --on-accent:#fff;--nav-surface:rgb(250 249 246 / .9);--menu-surface:rgb(250 249 246 / .98);
   --font:Geist,"PingFang SC","Microsoft YaHei",sans-serif;
   --ease:cubic-bezier(.22,1,.36,1);
